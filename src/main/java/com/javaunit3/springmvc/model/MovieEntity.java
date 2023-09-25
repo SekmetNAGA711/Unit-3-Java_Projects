@@ -60,7 +60,9 @@ public class MovieEntity
 
     }
 
-    public Collection<Object> getVotes() {
-        return null;
+    public List<VoteEntity> getVotes() {
+        return getVotes();
     }
+
+
 }

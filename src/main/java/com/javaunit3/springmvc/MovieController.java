@@ -27,8 +27,10 @@ public class MovieController {
 
 
 
-    public MovieController(BestMovieService bestMovieService) {
+
+    public MovieController(BestMovieService bestMovieService, SessionFactory sessionFactory) {
         this.bestMovieService = bestMovieService;
+        this.sessionFactory = sessionFactory;
     }
 
     @RequestMapping("/")
@@ -78,7 +80,7 @@ public class MovieController {
         MovieEntity movieEntity = (MovieEntity) session.get(MovieEntity.class, Integer.parseInt(movieId));
         VoteEntity newVote = new VoteEntity();
         newVote.setVoterName(voterName);
-        movieEntity.addVote(newVote);
+        movieEntity.getVotes().add(newVote);
 
         session.update(movieEntity);
 
@@ -101,6 +103,33 @@ public class MovieController {
 
         return "voteForBestMovie";
     }
+
+
+    @RequestMapping("/addMovie")
+    public String addMovie(HttpServletRequest request, Model model) {
+        String title = request.getParameter("title");
+        String maturityRating = request.getParameter("maturityRating");
+        String genre = request.getParameter("genre");
+
+        Session session = sessionFactory.getCurrentSession();
+
+        session.beginTransaction();
+
+        MovieEntity newMovie = new MovieEntity();
+        newMovie.setTitle(title);
+        newMovie.setMaturityRating(maturityRating);
+        newMovie.setGenre(genre);
+
+        // Save the new movie to the database
+        session.save(newMovie);
+
+        session.getTransaction().commit();
+
+        // Redirect to the home page after adding the movie
+        return "redirect:/";
+    }
+
+
 
     @Autowired
     private SessionFactory sessionFactory;
